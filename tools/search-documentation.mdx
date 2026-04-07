@@ -1,0 +1,144 @@
+---
+title: "search_{repo}_documentation"
+description: "Semantically searches a repository's documentation using AutoRAG when available, with a naive fallback. Best for specific feature or concept questions."
+---
+
+This tool lets the AI search repository documentation by query rather than loading everything at once. For repositories indexed by GitMCP, it uses Cloudflare AutoRAG for semantic search with relevance scoring. For repositories not yet indexed, it falls back to fetching the full documentation and returning it alongside a note that indexing may be in progress.
+
+<Tip>
+  Use this tool for targeted questions: specific functions, configuration options, error messages, or concepts. For broad "what is this project?" questions, use [`fetch_{repo}_documentation`](/tools/fetch-documentation) instead.
+</Tip>
+
+## Tool name
+
+For repository-specific endpoints, the tool is named using the repository name:
+
+```
+search_{repo}_documentation
+```
+
+For example, connecting to `gitmcp.io/langchain-ai/langchain` registers the tool as `search_langchain_documentation`.
+
+<Tabs>
+  <Tab title="Specific endpoint">
+    Tool name: `search_{repo}_documentation`
+
+    Requires a `query` parameter.
+  </Tab>
+  <Tab title="Generic endpoint (gitmcp.io/docs)">
+    Tool name: `search_generic_documentation`
+
+    Requires `owner`, `repo`, and `query` parameters.
+  </Tab>
+</Tabs>
+
+## Parameters
+
+<Tabs>
+  <Tab title="Specific endpoint">
+    <ParamField path="query" type="string" required>
+      The search query describing what you want to find in the documentation. Use natural language or specific terms.
+    </ParamField>
+  </Tab>
+  <Tab title="Generic endpoint (gitmcp.io/docs)">
+    <ParamField path="owner" type="string" required>
+      The GitHub repository owner (username or organization name).
+    </ParamField>
+
+    <ParamField path="repo" type="string" required>
+      The GitHub repository name.
+    </ParamField>
+
+    <ParamField path="query" type="string" required>
+      The search query describing what you want to find in the documentation.
+    </ParamField>
+  </Tab>
+</Tabs>
+
+## How search works
+
+GitMCP uses two search strategies depending on whether the repository has been indexed:
+
+### AutoRAG search (primary)
+
+When GitMCP has indexed the repository's documentation into its R2 storage, it queries a Cloudflare AutoRAG pipeline (`docs-rag`). The AutoRAG search:
+
+- Rewrites the query for better semantic matching (`rewrite_query: true`)
+- Returns up to 12 results filtered to the specific repository
+- Applies a relevance score threshold of 0.4 — results below this score are discarded
+- Returns matched content chunks along with source file names, URLs, and scores
+
+Each result includes the source file URL so the AI can call [`fetch_generic_url_content`](/tools/fetch-url-content) to retrieve the full file if needed.
+
+### Naive fallback
+
+If the repository has not been indexed yet, or if AutoRAG returns no results above the score threshold, GitMCP falls back to fetching the full documentation (equivalent to calling `fetch_{repo}_documentation`) and returning it with a note explaining the fallback. The AI can still answer questions using this content.
+
+<Info>
+  GitMCP's indexing pipeline processes repositories in the background when they are first accessed. If you see the naive fallback response, try again after a few minutes.
+</Info>
+
+## Response
+
+<ResponseField name="searchQuery" type="string">
+  The query as used for the search. When AutoRAG rewrites the query, this field reflects the rewritten version.
+</ResponseField>
+
+<ResponseField name="content" type="object[]">
+  An array containing a single text content block with formatted search results.
+
+  <Expandable title="properties">
+    <ResponseField name="content[].type" type="string">
+      Always `"text"`.
+    </ResponseField>
+
+    <ResponseField name="content[].text" type="string">
+      Formatted search results including matched content chunks, source file references with URLs and relevance scores (AutoRAG), or the full documentation with a fallback notice (naive search).
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Query examples
+
+**Effective queries** — specific, targeted, describe what you want to know:
+
+```
+"how to add memory to an agent"
+"streaming response configuration"
+"authentication with API keys"
+"retry on rate limit error"
+```
+
+**Less effective queries** — too broad, likely to return everything or nothing:
+
+```
+"documentation"
+"help"
+"how does this work"
+```
+
+## Example
+
+```
+User: How do I configure streaming in LangChain?
+
+AI calls: search_langchain_documentation({ query: "streaming response configuration" })
+
+Tool returns:
+{
+  "searchQuery": "streaming response configuration in LangChain",
+  "content": [{
+    "type": "text",
+    "text": "## Query\n\nstreaming response configuration.\n\n## Response\n\n### Sources:\n#### (docs/streaming.md)[https://...] (Score: 0.87)\n- Use `.stream()` instead of `.invoke()` to receive streamed output...\n"
+  }]
+}
+```
+
+## When to use this tool vs. others
+
+| Situation | Recommended tool |
+|---|---|
+| General overview, purpose, getting started | [`fetch_{repo}_documentation`](/tools/fetch-documentation) |
+| Specific feature, function, or concept | **`search_{repo}_documentation`** |
+| Finding a code implementation | [`search_{repo}_code`](/tools/search-code) |
+| Following a link from the docs | [`fetch_generic_url_content`](/tools/fetch-url-content) |

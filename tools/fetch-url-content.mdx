@@ -1,0 +1,122 @@
+---
+title: "fetch_generic_url_content"
+description: "Fetches the content of any absolute URL, respecting robots.txt rules. HTML is automatically converted to Markdown."
+---
+
+This tool retrieves the content of any publicly accessible URL. It is used to follow links that appear in fetched documentation — for example, when `fetch_{repo}_documentation` returns a file that references external guides, changelogs, or API references.
+
+Unlike the other GitMCP tools, this tool is **not** named after a specific repository. It is always registered as `fetch_generic_url_content`, regardless of which endpoint you connect to.
+
+<Info>
+  GitMCP respects `robots.txt` directives. If the target site's `robots.txt` disallows crawling, the tool returns a `"blocked"` status rather than the content.
+</Info>
+
+## Tool name
+
+```
+fetch_generic_url_content
+```
+
+This name is constant across all endpoints — specific repository endpoints and the generic `gitmcp.io/docs` endpoint alike.
+
+## Parameters
+
+<ParamField path="url" type="string" required>
+  The absolute URL of the page or document to fetch. Must include the scheme (e.g., `https://`). Relative URLs are not supported.
+</ParamField>
+
+## How content is fetched
+
+1. GitMCP checks the site's `robots.txt` before fetching the target URL. If the URL path is disallowed, the tool returns `status: "blocked"` without retrieving any content.
+2. If allowed, GitMCP fetches the URL and inspects the response body.
+3. If the content appears to be HTML (starts with `<!DOCTYPE`, `<html`, or contains `<body>`), it is automatically converted to Markdown using the `html-to-md` library.
+4. Non-HTML content (plain text, Markdown, JSON, etc.) is returned as-is.
+
+## Response
+
+<ResponseField name="url" type="string">
+  The URL that was fetched, as provided in the request.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The outcome of the fetch operation. One of:
+
+  | Value | Meaning |
+  |---|---|
+  | `"success"` | Content was retrieved successfully. |
+  | `"blocked"` | The target URL is disallowed by the site's `robots.txt`. |
+  | `"not_found"` | The URL could not be retrieved — the resource may not exist or may require authentication. |
+  | `"error"` | An unexpected error occurred while fetching the URL. |
+</ResponseField>
+
+<ResponseField name="content" type="object[]">
+  An array containing a single text content block.
+
+  <Expandable title="properties">
+    <ResponseField name="content[].type" type="string">
+      Always `"text"`.
+    </ResponseField>
+
+    <ResponseField name="content[].text" type="string">
+      The retrieved content. For `"success"` status, this is the page content (converted from HTML to Markdown if applicable). For other statuses, this is a human-readable explanation of why content could not be retrieved.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## robots.txt and privacy
+
+GitMCP's respect for `robots.txt` is part of its privacy commitment. Site owners can opt out of having their content fetched by setting appropriate `robots.txt` directives. When a URL is blocked:
+
+- The tool returns `status: "blocked"` immediately, without fetching the content.
+- The `content[].text` field explains that the URL is disallowed by `robots.txt`.
+- GitMCP does not store or log the blocked URL's content.
+
+## Examples
+
+**Successful fetch:**
+
+```
+AI calls: fetch_generic_url_content({ url: "https://raw.githubusercontent.com/langchain-ai/langchain/main/docs/streaming.md" })
+
+Tool returns:
+{
+  "url": "https://raw.githubusercontent.com/...",
+  "status": "success",
+  "content": [{ "type": "text", "text": "# Streaming\n\nLangChain supports streaming output from..." }]
+}
+```
+
+**Blocked by robots.txt:**
+
+```
+AI calls: fetch_generic_url_content({ url: "https://example.com/private-docs" })
+
+Tool returns:
+{
+  "url": "https://example.com/private-docs",
+  "status": "blocked",
+  "content": [{ "type": "text", "text": "Access to https://example.com/private-docs is disallowed by robots.txt. GitMCP respects robots.txt directives." }]
+}
+```
+
+**Resource not found:**
+
+```
+AI calls: fetch_generic_url_content({ url: "https://example.com/page-that-does-not-exist" })
+
+Tool returns:
+{
+  "url": "https://example.com/page-that-does-not-exist",
+  "status": "not_found",
+  "content": [{ "type": "text", "text": "Content at https://example.com/page-that-does-not-exist could not be retrieved. The resource may not exist or may require authentication." }]
+}
+```
+
+## When to use this tool vs. others
+
+| Situation | Recommended tool |
+|---|---|
+| General overview, purpose, getting started | [`fetch_{repo}_documentation`](/tools/fetch-documentation) |
+| Specific feature, function, or concept | [`search_{repo}_documentation`](/tools/search-documentation) |
+| Finding a code implementation | [`search_{repo}_code`](/tools/search-code) |
+| Following a URL referenced in documentation | **`fetch_generic_url_content`** |

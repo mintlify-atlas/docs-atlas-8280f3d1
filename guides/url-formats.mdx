@@ -1,0 +1,110 @@
+---
+title: "URL formats"
+description: "A complete reference for all three GitMCP URL patterns and when to use each one."
+---
+
+GitMCP exposes three URL patterns. Each targets a different type of GitHub resource. Choose the one that best matches your use case.
+
+| GitHub URL | GitMCP URL |
+|---|---|
+| `github.com/microsoft/typescript` | `gitmcp.io/microsoft/typescript` |
+| `langchain-ai.github.io/langgraph` | `langchain-ai.gitmcp.io/langgraph` |
+| Any repository | `gitmcp.io/docs` |
+
+<Note>
+  A URL converter is available on the [gitmcp.io](https://gitmcp.io) homepage. Paste any GitHub URL and it outputs the correct GitMCP URL instantly.
+</Note>
+
+## Patterns
+
+<AccordionGroup>
+  <Accordion title="Specific repository — gitmcp.io/{owner}/{repo}">
+    **Use this for:** GitHub repositories where you know the owner and repository name upfront.
+
+    Replace `github.com` with `gitmcp.io`. The path structure stays the same.
+
+    ```
+    github.com/microsoft/typescript
+              ↓
+    gitmcp.io/microsoft/typescript
+    ```
+
+    **Example MCP server URL:**
+    ```
+    https://gitmcp.io/microsoft/typescript
+    ```
+
+    Because the target repository is encoded in the URL, your AI assistant always queries the correct project. No ambiguity, no risk of accidentally fetching documentation from a different repository.
+
+    **When to use it:**
+    - You work primarily with one or a small set of libraries.
+    - You want predictable, scoped documentation access.
+    - Security matters — locking the URL to a specific repository prevents the AI from accessing unintended projects.
+  </Accordion>
+
+  <Accordion title="GitHub Pages — {owner}.gitmcp.io/{repo}">
+    **Use this for:** GitHub Pages documentation sites hosted at `owner.github.io/repo`.
+
+    Replace `owner.github.io` with `owner.gitmcp.io`. The repository name remains the path.
+
+    ```
+    langchain-ai.github.io/langgraph
+                          ↓
+    langchain-ai.gitmcp.io/langgraph
+    ```
+
+    **Example MCP server URL:**
+    ```
+    https://langchain-ai.gitmcp.io/langgraph
+    ```
+
+    <Note>
+      Before accessing any GitHub Pages site, GitMCP checks `robots.txt` and respects the directives set by the site owner. If the owner has opted out, GitMCP will not access that site.
+    </Note>
+
+    **When to use it:**
+    - The project publishes a documentation site on GitHub Pages (e.g., `owner.github.io/repo`).
+    - You want the AI assistant to query the Pages site directly rather than the repository source.
+  </Accordion>
+
+  <Accordion title="Generic / dynamic — gitmcp.io/docs">
+    **Use this for:** Any repository, decided at query time. The AI assistant determines which GitHub project to target based on your prompt or asks you to specify one.
+
+    **MCP server URL:**
+    ```
+    https://gitmcp.io/docs
+    ```
+
+    With this endpoint, GitMCP exposes tools named `fetch_generic_documentation`, `search_generic_documentation`, and `search_generic_code` instead of repository-specific names. The AI provides the target repository as an argument when calling each tool.
+
+    **When to use it:**
+    - You switch between many different repositories frequently.
+    - You want maximum flexibility without reconfiguring your MCP server for each project.
+    - You're exploring an unfamiliar library and want the AI to locate its documentation automatically.
+
+    <Warning>
+      The generic endpoint relies on the AI correctly identifying the target repository from context. For critical or security-sensitive workflows, prefer the specific repository or GitHub Pages patterns so the target is always explicit.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+## Conversion examples
+
+| GitHub URL | GitMCP URL | Pattern |
+|---|---|---|
+| `github.com/microsoft/typescript` | `gitmcp.io/microsoft/typescript` | Specific repository |
+| `github.com/vercel/next.js` | `gitmcp.io/vercel/next.js` | Specific repository |
+| `github.com/mrdoob/three.js` | `gitmcp.io/mrdoob/three.js` | Specific repository |
+| `langchain-ai.github.io/langgraph` | `langchain-ai.gitmcp.io/langgraph` | GitHub Pages |
+| `vitejs.github.io/vite` | `vitejs.gitmcp.io/vite` | GitHub Pages |
+| Any repository | `gitmcp.io/docs` | Generic / dynamic |
+
+## Choosing the right pattern
+
+| Situation | Recommended pattern |
+|---|---|
+| Working with one or two specific libraries | Specific repository |
+| Library publishes docs on GitHub Pages | GitHub Pages |
+| Exploring multiple repositories in one session | Generic / dynamic |
+| Security-sensitive environment | Specific repository or GitHub Pages |
+| Unsure which repository to use | Generic / dynamic |

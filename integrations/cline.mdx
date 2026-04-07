@@ -1,0 +1,51 @@
+---
+title: "Connect Cline"
+description: "Add GitMCP as an MCP server in Cline to give your AI assistant access to up-to-date GitHub documentation."
+---
+
+Cline is an autonomous AI coding agent for VS Code. It manages MCP servers through a global settings file and supports SSE-based remote servers directly.
+
+## Prerequisites
+
+- [VS Code](https://code.visualstudio.com/) with the [Cline extension](https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev) installed.
+- The GitHub `{owner}` and `{repo}` values for the repository you want to connect.
+
+## Configuration
+
+<Steps>
+  <Step title="Open the Cline MCP settings file">
+    Open the following file in any text editor (create it if it does not exist):
+
+    ```
+    ~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
+    ```
+
+    On Linux, replace `~/Library/Application Support` with `~/.config`. On Windows, the path is under `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\`.
+  </Step>
+  <Step title="Add the GitMCP server">
+    Paste the following configuration, replacing `{owner}` with the GitHub username or organization and `{repo}` with the repository name:
+
+    ```json
+    {
+      "mcpServers": {
+        "gitmcp": {
+          "url": "https://gitmcp.io/{owner}/{repo}",
+          "disabled": false,
+          "autoApprove": []
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Reload VS Code">
+    Save the file and reload the VS Code window (`Ctrl+Shift+P` → **Developer: Reload Window**). The GitMCP server will appear in Cline's MCP server list.
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name. For example, to connect to `github.com/openai/openai-python`, use `https://gitmcp.io/openai/openai-python`.
+</Note>
+
+<Tip>
+  To access any repository dynamically without changing the config, use the generic endpoint: `https://gitmcp.io/docs`. Cline's AI will ask for or infer the target repository from your prompt.
+</Tip>

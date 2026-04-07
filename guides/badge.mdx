@@ -1,0 +1,49 @@
+---
+title: "Repository badge"
+description: "Add a GitMCP badge to your repository's README to show how many times your documentation has been accessed."
+---
+
+GitMCP provides a dynamic badge you can add to your repository's `README.md`. It displays a view count that increments each time an AI assistant calls a GitMCP tool to access your repository's documentation or code.
+
+[![GitMCP](https://img.shields.io/endpoint?url=https://gitmcp.io/badge/idosal/git-mcp)](https://gitmcp.io/idosal/git-mcp)
+
+<Note>
+  The badge gives your users a one-click path to connect your documentation to their AI assistant. It also signals that your project supports AI-assisted development workflows, encouraging broader adoption.
+</Note>
+
+## Adding the badge
+
+Paste the following into your `README.md`, replacing `OWNER` with your GitHub username or organization and `REPO` with your repository name:
+
+```markdown
+[![GitMCP](https://img.shields.io/endpoint?url=https://gitmcp.io/badge/OWNER/REPO)](https://gitmcp.io/OWNER/REPO)
+```
+
+The badge links directly to your repository's GitMCP page at `https://gitmcp.io/OWNER/REPO`, where visitors can start a browser-based chat with your documentation or copy the MCP server URL for their IDE.
+
+## How view counts work
+
+The count shown on the badge increments once for each tool call made against your specific repository. This includes:
+
+- Fetching the primary documentation (`fetch_<repo>_documentation`)
+- Searching documentation (`search_<repo>_documentation`)
+- Searching code (`search_<repo>_code`)
+
+Each tool call from an AI assistant represents a real interaction with your documentation — not a page load or a bot crawl.
+
+## Customizing the badge
+
+Append query parameters to the badge endpoint URL to change its appearance.
+
+| Parameter | Description | Default | Example |
+|---|---|---|---|
+| `color` | Color for the badge value | `aquamarine` | `?color=green` |
+| `label` | Text label on the left side of the badge | `GitMCP` | `?label=Documentation` |
+
+Apply parameters to the `url` query value inside the shields.io endpoint:
+
+```markdown
+[![GitMCP](https://img.shields.io/endpoint?url=https://gitmcp.io/badge/OWNER/REPO?color=green&label=Docs)](https://gitmcp.io/OWNER/REPO)
+```
+
+The badge is served through [shields.io](https://shields.io) and cached for five minutes, so count updates may take a short time to appear.

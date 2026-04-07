@@ -1,0 +1,58 @@
+---
+title: "MCP tools reference"
+description: "All tools GitMCP exposes to AI assistants — what they do, when to use them, and how their names are generated."
+---
+
+GitMCP registers a set of MCP tools with your AI assistant when you connect a repository. The AI can call these tools to fetch documentation, search for specific topics, browse source code, and follow links — giving it accurate, up-to-date context instead of relying on training data.
+
+## Tool naming
+
+For repository-specific endpoints (`gitmcp.io/{owner}/{repo}` or `{owner}.gitmcp.io/{repo}`), tool names include the repository name:
+
+| Pattern | Example (repo: `langchain`) |
+|---|---|
+| `fetch_{repo}_documentation` | `fetch_langchain_documentation` |
+| `search_{repo}_documentation` | `search_langchain_documentation` |
+| `search_{repo}_code` | `search_langchain_code` |
+
+Non-alphanumeric characters in the repository name are replaced with underscores. If the combined tool name and server name would exceed 50 characters, GitMCP shortens the suffix (`_documentation` → `_docs`) and then truncates the repository name as needed.
+
+The `fetch_generic_url_content` tool is always named exactly that, regardless of which endpoint you use.
+
+<Note>
+  When using the generic endpoint (`gitmcp.io/docs`), tool names change and require `owner` and `repo` parameters. See the [generic endpoint section](#generic-endpoint-gitmcpio-docs) below.
+</Note>
+
+## Available tools
+
+<CardGroup cols={2}>
+  <Card title="fetch_{repo}_documentation" icon="file-lines" href="/tools/fetch-documentation">
+    Fetches the primary documentation file for the repository. Always call this first for general questions about a project.
+  </Card>
+  <Card title="search_{repo}_documentation" icon="magnifying-glass" href="/tools/search-documentation">
+    Semantically searches repository documentation using AutoRAG or a naive fallback. Best for specific feature or concept questions.
+  </Card>
+  <Card title="search_{repo}_code" icon="code" href="/tools/search-code">
+    Searches the repository's source code via the GitHub Search API. Returns matching file paths with pagination support.
+  </Card>
+  <Card title="fetch_generic_url_content" icon="link" href="/tools/fetch-url-content">
+    Fetches the content of any absolute URL, respecting robots.txt. Used to follow links referenced in documentation.
+  </Card>
+</CardGroup>
+
+## Generic endpoint (`gitmcp.io/docs`)
+
+When you connect to the generic `gitmcp.io/docs` endpoint, GitMCP exposes a different set of tool names. Each tool accepts `owner` and `repo` as explicit parameters instead of encoding the repository in the tool name.
+
+| Generic tool name | Equivalent repo-specific tool | Additional params |
+|---|---|---|
+| `fetch_generic_documentation` | `fetch_{repo}_documentation` | `owner`, `repo` |
+| `search_generic_documentation` | `search_{repo}_documentation` | `owner`, `repo`, `query` |
+| `search_generic_code` | `search_{repo}_code` | `owner`, `repo`, `query`, `page?` |
+| `match_common_libs_owner_repo_mapping` | _(no equivalent)_ | `library` |
+
+The `match_common_libs_owner_repo_mapping` tool is unique to the generic endpoint. It resolves a plain library name (e.g., `"react"` or `"langchain"`) to the corresponding `owner`/`repo` pair, which you can then pass to the other tools.
+
+<Tip>
+  Use the specific endpoint (`gitmcp.io/{owner}/{repo}`) when you primarily work with one library. Use the generic endpoint when you frequently switch between different repositories.
+</Tip>

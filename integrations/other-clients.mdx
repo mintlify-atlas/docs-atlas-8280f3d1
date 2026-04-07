@@ -1,0 +1,125 @@
+---
+title: "Other MCP Clients"
+description: "Connect GitMCP to Highlight AI, Augment Code, Msty AI, and any other MCP-compatible AI assistant."
+---
+
+GitMCP works with any AI assistant that supports the Model Context Protocol. The connection method depends on the transport type your client supports:
+
+- **SSE transport**: Use `https://gitmcp.io/{owner}/{repo}` directly as the server URL.
+- **stdio transport**: Use `npx mcp-remote https://gitmcp.io/{owner}/{repo}` as the command. This bridges the SSE endpoint to stdio without requiring a permanent install.
+
+The sections below cover specific configuration steps for Highlight AI, Augment Code, and Msty AI.
+
+---
+
+## Highlight AI
+
+<Steps>
+  <Step title="Open the plugins sidebar">
+    Open Highlight AI and click the **plugins icon** (the `@` symbol) in the sidebar.
+  </Step>
+  <Step title="Navigate to Installed Plugins">
+    Click **Installed Plugins** at the top of the sidebar.
+  </Step>
+  <Step title="Add a custom plugin">
+    Select **Custom Plugin**, then click **Add a plugin using a custom SSE URL**.
+  </Step>
+  <Step title="Enter the GitMCP details">
+    Fill in the following fields:
+
+    - **Plugin name**: `gitmcp`
+    - **SSE URL**: `https://gitmcp.io/{owner}/{repo}`
+
+    Replace `{owner}` and `{repo}` with the target GitHub username and repository name, then save.
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name.
+</Note>
+
+---
+
+## Augment Code
+
+<Steps>
+  <Step title="Open Augment Code settings">
+    Open the Augment Code settings panel in your IDE.
+  </Step>
+  <Step title="Navigate to the MCP section">
+    Go to the **MCP** section within settings.
+  </Step>
+  <Step title="Add a new MCP server">
+    Add a new server with the following details:
+
+    - **Name**: `git-mcp Docs`
+    - **Command**: `npx mcp-remote https://gitmcp.io/{owner}/{repo}`
+
+    Alternatively, use the JSON configuration format:
+
+    ```json
+    {
+      "mcpServers": {
+        "git-mcp Docs": {
+          "command": "npx",
+          "args": [
+            "mcp-remote",
+            "https://gitmcp.io/{owner}/{repo}"
+          ]
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name.
+</Note>
+
+---
+
+## Msty AI
+
+<Steps>
+  <Step title="Open Msty Studio">
+    Launch Msty AI and navigate to **Msty Studio**.
+  </Step>
+  <Step title="Open the Tools import dialog">
+    Go to **Tools → Import Tools from JSON Clipboard**.
+  </Step>
+  <Step title="Paste the GitMCP configuration">
+    Paste the following JSON, replacing `{owner}` and `{repo}` with the target repository details:
+
+    ```json
+    {
+      "mcpServers": {
+        "git-mcp Docs": {
+          "command": "npx",
+          "args": [
+            "mcp-remote",
+            "https://gitmcp.io/{owner}/{repo}"
+          ]
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name.
+</Note>
+
+---
+
+## Any other MCP-compatible client
+
+GitMCP exposes a standard SSE endpoint and requires no authentication or installation on the server side.
+
+- **If your client supports SSE transport**: add `https://gitmcp.io/{owner}/{repo}` as the server URL.
+- **If your client requires stdio**: run `npx mcp-remote https://gitmcp.io/{owner}/{repo}` as the server command. Node.js must be available on your PATH.
+
+<Tip>
+  For maximum flexibility across many repositories, use the generic endpoint `https://gitmcp.io/docs` instead of a repository-specific URL. The AI assistant will determine which GitHub repository to query based on the context of each request.
+</Tip>

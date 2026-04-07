@@ -1,0 +1,124 @@
+---
+title: "fetch_{repo}_documentation"
+description: "Fetches the primary documentation file for a GitHub repository. Always call this tool first for general questions about a project."
+---
+
+This tool retrieves the primary documentation for the connected repository. It tries several sources in a defined priority order, so even repositories without a dedicated `llms.txt` file will return useful content. Results are cached for 30 minutes.
+
+<Tip>
+  The AI should call this tool first whenever you ask a general question about a project — its purpose, how to install it, what features it has, or how to get started.
+</Tip>
+
+## Tool name
+
+For repository-specific endpoints, the tool is named using the repository name:
+
+```
+fetch_{repo}_documentation
+```
+
+For example, connecting to `gitmcp.io/microsoft/typescript` registers the tool as `fetch_microsoft_typescript_documentation` (subject to the 50-character combined name limit — see [tool naming](/tools/overview#tool-naming)).
+
+<Tabs>
+  <Tab title="Specific endpoint">
+    Tool name: `fetch_{repo}_documentation`
+
+    No parameters required.
+  </Tab>
+  <Tab title="Generic endpoint (gitmcp.io/docs)">
+    Tool name: `fetch_generic_documentation`
+
+    Requires `owner` and `repo` parameters.
+  </Tab>
+</Tabs>
+
+## Parameters
+
+This tool takes no input parameters when used with a repository-specific endpoint.
+
+<Tabs>
+  <Tab title="Specific endpoint">
+    _(No parameters)_
+  </Tab>
+  <Tab title="Generic endpoint (gitmcp.io/docs)">
+    <ParamField path="owner" type="string" required>
+      The GitHub repository owner (username or organization name).
+    </ParamField>
+
+    <ParamField path="repo" type="string" required>
+      The GitHub repository name.
+    </ParamField>
+  </Tab>
+</Tabs>
+
+## How documentation is located
+
+GitMCP checks sources in the following priority order. It stops as soon as content is found.
+
+### GitHub repositories (`gitmcp.io/{owner}/{repo}`)
+
+1. **`docs/docs/llms.txt`** — checked in parallel with the others below
+2. **`llms.txt`** (repository root) — checked in parallel
+3. **`docs/llms.txt`** — checked in parallel
+4. **GitHub Search API** — searches the repository for `llms.txt` if none of the static paths matched
+5. **R2 fallback** — retrieves a pre-generated `llms.txt` stored by GitMCP's indexing pipeline
+6. **`README.*`** — searches for any `README.*` file at the repository root
+
+The three static paths (steps 1–3) are fetched in parallel to minimize latency. The first one that returns content wins.
+
+### GitHub Pages sites (`{owner}.gitmcp.io/{repo}`)
+
+1. **`llms.txt`** at the site root (with robots.txt check)
+2. **Landing page (`index.html`)** — fetched and converted to Markdown
+3. **`README.md`** at the site root
+
+All GitHub Pages fetches respect `robots.txt`. If the target URL is blocked, the tool returns a message explaining the restriction rather than the content.
+
+## Response
+
+<ResponseField name="fileUsed" type="string">
+  The name of the file or source that provided the content. Possible values include `"llms.txt"`, `"llms.txt (generated)"`, `"README.md"`, `"landing page (index.html, converted to Markdown)"`, `"robots.txt restriction"`, or `"unknown"`.
+</ResponseField>
+
+<ResponseField name="content" type="object[]">
+  An array containing a single text content block.
+
+  <Expandable title="properties">
+    <ResponseField name="content[].type" type="string">
+      Always `"text"`.
+    </ResponseField>
+
+    <ResponseField name="content[].text" type="string">
+      The full documentation content as a string. If no documentation was found, the value is `"No documentation found."`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Caching
+
+Successful results are cached for **30 minutes** per repository. Subsequent calls within that window return the cached result immediately, without hitting GitHub or R2 again.
+
+## Example
+
+```
+User: How do I get started with LangGraph?
+
+AI calls: fetch_langgraph_documentation()
+
+Tool returns:
+{
+  "fileUsed": "llms.txt",
+  "content": [{ "type": "text", "text": "# LangGraph\n\nLangGraph is a library for building..." }]
+}
+
+AI uses the returned content to answer the question accurately.
+```
+
+## When to use this tool vs. others
+
+| Situation | Recommended tool |
+|---|---|
+| General overview, purpose, getting started | **`fetch_{repo}_documentation`** |
+| Specific feature, function, or concept | [`search_{repo}_documentation`](/tools/search-documentation) |
+| Finding a code implementation | [`search_{repo}_code`](/tools/search-code) |
+| Following a link from the docs | [`fetch_generic_url_content`](/tools/fetch-url-content) |

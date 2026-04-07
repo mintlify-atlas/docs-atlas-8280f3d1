@@ -1,0 +1,46 @@
+---
+title: "Privacy"
+description: "How GitMCP handles your data — and what it never touches."
+---
+
+GitMCP is built around a minimal data footprint. No accounts, no query logs, no background scraping. Here is exactly what the service does and does not do with your data.
+
+## Privacy commitments
+
+<CardGroup cols={2}>
+  <Card title="No personal data collected" icon="user-slash">
+    GitMCP requires no authentication. It has no access to your identity, email address, or any personally identifiable information.
+  </Card>
+  <Card title="No query storage" icon="database">
+    Queries sent by AI assistants to GitMCP are not stored. Each request is processed and discarded — there is no query log or conversation history.
+  </Card>
+  <Card title="Public content only" icon="lock-open">
+    GitMCP only accesses content that is already publicly available on GitHub. It never requests private repositories or authenticated resources.
+  </Card>
+  <Card title="On-demand access only" icon="clock">
+    GitMCP fetches repository content only when an AI assistant makes a tool call. There is no background indexing, scheduled scraping, or proactive crawling of repositories.
+  </Card>
+  <Card title="robots.txt compliance" icon="robot">
+    Before accessing any GitHub Pages site, GitMCP checks the site's `robots.txt` file and follows the directives set by the site owner. Site owners can opt out by adding appropriate rules to their `robots.txt`.
+  </Card>
+  <Card title="No permanent content storage" icon="trash">
+    GitMCP does not permanently store GitHub project content. Caching is used to reduce redundant API calls, but cached data is not retained indefinitely or shared across unrelated requests.
+  </Card>
+</CardGroup>
+
+## Open source as a trust mechanism
+
+GitMCP's source code is publicly available at [github.com/idosal/git-mcp](https://github.com/idosal/git-mcp). Every privacy claim on this page can be verified by reading the code directly. There is no proprietary layer between the stated behavior and the implementation.
+
+If you require absolute certainty about data handling, you can [self-host GitMCP](/guides/self-hosting) on your own Cloudflare account. Self-hosting gives you full control over the infrastructure, network access, and data retention policies.
+
+## Summary
+
+| Data type | Collected | Stored | Shared |
+|---|---|---|---|
+| Personal identity | No | No | No |
+| AI assistant queries | No | No | No |
+| Repository content | On demand only | Not permanently | No |
+| Usage metrics (anonymous) | Yes (view counts) | Yes (per-repo counter) | No |
+
+The only persistent data GitMCP maintains is the per-repository view count used to power the [badge feature](/guides/badge). This counter stores a single integer keyed to `owner/repo` — no query content, no user identifiers, no timestamps.

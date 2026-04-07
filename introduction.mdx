@@ -1,0 +1,67 @@
+---
+title: "Introduction"
+description: "GitMCP is a free, open-source remote MCP server that gives any AI assistant accurate, up-to-date context from any GitHub repository."
+---
+
+## What is GitMCP?
+
+AI coding assistants are powerful, but they are limited by their training data. When you ask your assistant about a library it has never seen — or a version released after its training cutoff — it guesses. Those guesses look plausible but are wrong: hallucinated function signatures, deprecated APIs, invented configuration options.
+
+GitMCP solves this by acting as a live bridge between your AI tool and any GitHub project. It transforms any public GitHub repository or GitHub Pages site into a remote [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server. Your AI assistant connects to that server and retrieves the real, current documentation before responding. No hallucinations. No stale examples.
+
+<Info>
+  MCP (Model Context Protocol) is an open standard that lets AI assistants request structured context from external sources. GitMCP speaks MCP natively, so no custom plugins or wrappers are needed.
+</Info>
+
+## Two server modes
+
+GitMCP offers two modes depending on how you work.
+
+**Specific repository** — point GitMCP at a single project. Use this when you work regularly with a particular library and want your assistant to always target that project. This is the recommended mode for most workflows.
+
+| GitHub URL | GitMCP URL |
+|---|---|
+| `github.com/owner/repo` | `gitmcp.io/owner/repo` |
+| `owner.github.io/repo` | `owner.gitmcp.io/repo` |
+
+**Generic server** — use `gitmcp.io/docs` when you need to switch between many different repositories. The AI assistant determines which repository to query based on the context of your question. This mode is more flexible but requires the model to correctly identify the target project each time.
+
+## Key benefits
+
+<CardGroup cols={2}>
+  <Card title="Latest documentation" icon="rotate">
+    GitMCP fetches documentation directly from GitHub, so your AI assistant always has the most current information — not a snapshot from training.
+  </Card>
+  <Card title="No hallucinations" icon="circle-check">
+    With real documentation as context, your assistant produces accurate API calls, correct configuration, and working code examples.
+  </Card>
+  <Card title="Zero setup" icon="bolt">
+    GitMCP runs in the cloud. Replace `github.com` with `gitmcp.io` in any repository URL, paste it into your IDE as an MCP server, and you are done. No installations, no accounts.
+  </Card>
+  <Card title="Free and open source" icon="code-branch">
+    GitMCP is free to use and fully open source. You can inspect the code, contribute, or self-host it in your own environment.
+  </Card>
+  <Card title="Privacy-first" icon="lock">
+    GitMCP requires no authentication, stores no personally identifiable information, and does not log your queries. It only accesses content that is already publicly available on GitHub.
+  </Card>
+  <Card title="Works with any GitHub project" icon="github">
+    Any public GitHub repository works without modification. Project owners do not need to configure anything.
+  </Card>
+</CardGroup>
+
+## Supported AI assistants
+
+GitMCP works with any MCP-compatible AI tool:
+
+**Cursor** · **Claude Desktop** · **Windsurf** · **VSCode** · **Cline** · **Highlight AI** · **Augment Code** · **Msty AI**
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Connect your first repository to an AI assistant in under two minutes.
+  </Card>
+  <Card title="Connect your AI assistant" icon="plug" href="/integrations/cursor">
+    Step-by-step configuration guides for every supported tool.
+  </Card>
+</CardGroup>

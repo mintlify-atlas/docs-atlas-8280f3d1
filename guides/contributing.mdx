@@ -1,0 +1,144 @@
+---
+title: "Contributing"
+description: "How to set up a local development environment and submit contributions to GitMCP."
+---
+
+Contributions, bug reports, and feature suggestions are welcome. This page covers everything you need to get GitMCP running locally and submit a pull request.
+
+## Prerequisites
+
+Before you start, make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) 18 or higher
+- [pnpm](https://pnpm.io/) 8.15.7 or higher
+- Git
+
+## Local development setup
+
+<Steps>
+  <Step title="Fork and clone the repository">
+    Fork [idosal/git-mcp](https://github.com/idosal/git-mcp) on GitHub, then clone your fork:
+
+    ```bash
+    git clone https://github.com/your-username/git-mcp.git
+    cd git-mcp
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    ```bash
+    pnpm install
+    ```
+  </Step>
+
+  <Step title="Start the development server">
+    ```bash
+    pnpm dev
+    ```
+
+    The server starts at `http://localhost:5173`. To test MCP endpoints interactively, use the MCP Inspector:
+
+    ```bash
+    npx @modelcontextprotocol/inspector
+    ```
+
+    Set **Transport Type** to `SSE`, enter `http://localhost:5173/docs`, and click **Connect**.
+  </Step>
+</Steps>
+
+## Testing
+
+GitMCP uses [Vitest](https://vitest.dev/) for unit tests and [Playwright](https://playwright.dev/) for end-to-end tests.
+
+```bash
+# Run unit tests
+pnpm test
+
+# Run end-to-end tests
+pnpm test:e2e
+```
+
+When adding new features, include tests that cover the new behavior.
+
+## Code formatting and linting
+
+GitMCP uses [Biome](https://biomejs.dev/) for formatting and linting, with [Prettier](https://prettier.io/) applied to staged TypeScript files automatically via Husky and lint-staged before each commit.
+
+To run formatting and linting manually:
+
+```bash
+# Format all files with Biome
+pnpm format
+
+# Fix lint issues automatically with Biome
+pnpm lint:fix
+```
+
+## How to contribute
+
+### Reporting bugs
+
+Open a new issue on [GitHub Issues](https://github.com/idosal/git-mcp/issues). Include:
+
+- A clear description of the problem
+- Steps to reproduce it
+- Any relevant error messages or logs
+
+### Suggesting enhancements
+
+Open a new issue on [GitHub Issues](https://github.com/idosal/git-mcp/issues). Describe the enhancement, explain the use case, and outline the benefits it would bring to the project.
+
+### Submitting pull requests
+
+<Steps>
+  <Step title="Create a branch">
+    Use a descriptive branch name:
+
+    ```bash
+    git checkout -b feature/your-feature-name
+    # or
+    git checkout -b fix/your-bugfix-name
+    ```
+  </Step>
+
+  <Step title="Make your changes">
+    Follow the code style used in the rest of the codebase. Add tests where applicable.
+  </Step>
+
+  <Step title="Run tests and formatting">
+    ```bash
+    pnpm test
+    pnpm format
+    pnpm lint:fix
+    ```
+  </Step>
+
+  <Step title="Commit your changes">
+    Write clear, concise commit messages. Use the imperative mood and start with a capitalized verb:
+
+    ```
+    Add support for custom robots.txt rules
+    Fix badge count not incrementing on code search
+    Refactor URL parsing to handle edge cases
+    ```
+  </Step>
+
+  <Step title="Open a pull request">
+    Push your branch to your fork and open a pull request against the `main` branch of [idosal/git-mcp](https://github.com/idosal/git-mcp). Include a clear description of your changes and reference any related issues.
+  </Step>
+</Steps>
+
+## Project structure
+
+| Directory | Contents |
+|---|---|
+| `src/api/` | Server-side code and MCP implementation |
+| `src/api/tools/` | MCP tools (fetch documentation, search, etc.) |
+| `src/api/utils/` | Utility functions used by the API layer |
+| `src/shared/` | Utilities shared across the codebase (e.g., URL parsing) |
+| `app/` | React Router app and UI components |
+| `public/` | Static assets |
+
+## Security vulnerabilities
+
+To report a security vulnerability, use the private [disclosure form](https://forms.gle/mMoVv69XFyPqDUTX8). Do not open a public GitHub issue for security-related matters. All reports are addressed as quickly as possible.

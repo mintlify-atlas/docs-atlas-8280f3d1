@@ -1,0 +1,44 @@
+---
+title: "Connect VS Code"
+description: "Add GitMCP as an MCP server in VS Code to give GitHub Copilot and other AI extensions access to up-to-date GitHub documentation."
+---
+
+VS Code supports MCP servers through a per-workspace configuration file. GitMCP connects over SSE using the `sse` transport type, so no additional tooling is required.
+
+## Prerequisites
+
+- [VS Code](https://code.visualstudio.com/) with an MCP-compatible AI extension (e.g., GitHub Copilot with agent mode).
+- The GitHub `{owner}` and `{repo}` values for the repository you want to connect.
+
+## Configuration
+
+<Steps>
+  <Step title="Create or open the workspace MCP config file">
+    In the root of your project, create the file `.vscode/mcp.json` if it does not already exist. This file is workspace-scoped, so GitMCP will only be active for this project.
+  </Step>
+  <Step title="Add the GitMCP server">
+    Paste the following configuration, replacing `{owner}` with the GitHub username or organization and `{repo}` with the repository name:
+
+    ```json
+    {
+      "servers": {
+        "gitmcp": {
+          "type": "sse",
+          "url": "https://gitmcp.io/{owner}/{repo}"
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Reload VS Code">
+    Save the file. VS Code will detect the new server configuration automatically. You may need to reload the window (`Ctrl+Shift+P` → **Developer: Reload Window**) for the server to appear.
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name. For example, to connect to `github.com/langchain-ai/langgraph`, use `https://gitmcp.io/langchain-ai/langgraph`.
+</Note>
+
+<Tip>
+  For flexible access to multiple repositories without editing the config each time, use the generic endpoint: `https://gitmcp.io/docs`. The AI will determine which repository to query based on your request.
+</Tip>

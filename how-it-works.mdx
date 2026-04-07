@@ -1,0 +1,92 @@
+---
+title: "How it works"
+description: "A walkthrough of how GitMCP routes requests, fetches documentation, and returns grounded context to your AI assistant."
+---
+
+## Request flow
+
+When you ask your AI assistant a question about a library, here is what happens end to end:
+
+<Steps>
+  <Step title="You configure the GitMCP URL">
+    You add a GitMCP URL as an MCP server in your IDE or AI tool — for example, `https://gitmcp.io/microsoft/typescript`. GitMCP advertises a set of tools to the AI assistant: documentation fetching, semantic search, code search, and URL content retrieval.
+  </Step>
+  <Step title="You prompt your AI assistant">
+    You ask a question that relates to the connected repository, such as "How do I use strict mode in TypeScript?" The AI assistant recognizes it needs external context.
+  </Step>
+  <Step title="The AI calls a GitMCP tool">
+    The assistant invokes one of the GitMCP tools — typically `fetch_typescript_documentation` or `search_typescript_documentation` — with your approval. The tool call is sent to GitMCP over the MCP protocol.
+  </Step>
+  <Step title="GitMCP fetches from GitHub">
+    GitMCP resolves the repository from the request URL, determines the best documentation source (see below), and fetches the content directly from GitHub or the project's GitHub Pages site. Results are cached for 30 minutes to reduce latency on repeat calls.
+  </Step>
+  <Step title="The AI receives grounded context">
+    GitMCP returns the documentation to the AI assistant. The assistant uses this real, current content to generate an accurate response — no guessing, no hallucinations.
+  </Step>
+</Steps>
+
+## Documentation priority order
+
+When GitMCP fetches documentation for a repository, it checks sources in the following order and uses the first one it finds:
+
+1. **`llms.txt`** — a machine-readable documentation file optimized for language models, following the [llms.txt standard](https://llmstxt.org). GitMCP checks common locations: `llms.txt`, `docs/llms.txt`, and `docs/docs/llms.txt`.
+2. **AI-optimized documentation** — a pre-generated version of the project's documentation stored in GitMCP's own index, used when a first-party `llms.txt` is not present.
+3. **`README.md`** — the repository's root README file, used as a fallback when neither of the above is available.
+
+<AccordionGroup>
+  <Accordion title="What documentation sources does GitMCP support?">
+    GitMCP can retrieve documentation from several sources depending on the repository type and what is available:
+
+    **For GitHub repositories (`gitmcp.io/owner/repo`)**
+
+    - `llms.txt` files in common locations: root, `docs/`, and `docs/docs/`
+    - Pre-generated AI-optimized documentation stored in GitMCP's index
+    - `README.md` and other README variants (e.g., `README.asciidoc`) at the repository root
+
+    **For GitHub Pages sites (`owner.gitmcp.io/repo`)**
+
+    - `llms.txt` at the root of the Pages site
+    - The site's landing page (`index.html`), converted to Markdown
+    - `README.md` at the root of the Pages site
+
+    In all cases, GitMCP respects `robots.txt` directives. If a site's `robots.txt` disallows access to a resource, GitMCP will not retrieve it and will return an appropriate message to the AI assistant.
+  </Accordion>
+</AccordionGroup>
+
+## URL routing
+
+GitMCP uses the structure of the request URL to determine which GitHub project to connect to.
+
+**Path pattern — GitHub repositories**
+
+```
+gitmcp.io/{owner}/{repo}
+```
+
+Routes to the GitHub repository at `github.com/{owner}/{repo}`. Use this for standard repositories.
+
+**Subdomain pattern — GitHub Pages**
+
+```
+{owner}.gitmcp.io/{repo}
+```
+
+Routes to the GitHub Pages site at `{owner}.github.io/{repo}`. Use this when the project publishes documentation through GitHub Pages — for example, `langchain-ai.gitmcp.io/langgraph` maps to `langchain-ai.github.io/langgraph`.
+
+**Generic endpoint**
+
+```
+gitmcp.io/docs
+```
+
+A dynamic endpoint that does not target a specific repository. The AI assistant determines which GitHub project to query at runtime based on the context of the conversation.
+
+## Caching
+
+GitMCP caches documentation fetch results with a 30-minute TTL. Subsequent requests for the same repository within the cache window return the stored result immediately, reducing latency and the number of GitHub API calls.
+
+The cache is keyed by `owner/repo`. Forcing a fresh fetch is not currently supported from the client side; the cache expires automatically after 30 minutes.
+
+## Privacy
+
+GitMCP does not require authentication and does not store personally identifiable information or query content. It only accesses content that is already publicly available on GitHub, and only when a user initiates a request. See [Privacy](/guides/privacy) for full details.

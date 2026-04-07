@@ -1,0 +1,111 @@
+---
+title: "Self-hosting"
+description: "Run your own GitMCP instance on Cloudflare Workers for full control over the service."
+---
+
+GitMCP is open-source and designed to run on [Cloudflare Workers](https://workers.cloudflare.com/). The public service at [gitmcp.io](https://gitmcp.io) is free to use, but you can self-host the entire stack if you prefer to control the infrastructure.
+
+<Note>
+  Self-hosting is optional. The public GitMCP service at gitmcp.io is free, requires no sign-up, and is ready to use immediately. Follow this guide only if you need full control over the deployment environment.
+</Note>
+
+## Prerequisites
+
+- Node.js 18 or higher
+- pnpm (any recent version)
+- A [Cloudflare account](https://dash.cloudflare.com/sign-up) with Workers enabled
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) (installed automatically via pnpm)
+
+## Deploy to Cloudflare Workers
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/idosal/git-mcp.git
+    cd git-mcp
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    ```bash
+    pnpm install
+    ```
+  </Step>
+
+  <Step title="Configure environment variables">
+    Copy the example environment file and fill in your values:
+
+    ```bash
+    cp .env.example .env.local
+    ```
+
+    The `.env.example` shows the variables you can configure:
+
+    ```bash
+    XAI_API_KEY=""
+    OPENAI_API_KEY=
+    DATABASE_URL="postgresql://username:password@host:port/database"
+    ```
+
+    These API keys are used by the embedded chat feature to power the in-browser AI conversation. They are optional — the MCP server functionality works without them, but the chat UI requires at least one AI provider key to be set.
+  </Step>
+
+  <Step title="Run locally">
+    Start the development server:
+
+    ```bash
+    pnpm dev
+    ```
+
+    The server starts at `http://localhost:5173`. You can test it immediately using the MCP Inspector (see below) or point any MCP-compatible client at `http://localhost:5173/docs`.
+  </Step>
+
+  <Step title="Deploy to Cloudflare Workers">
+    When you're ready to deploy:
+
+    ```bash
+    pnpm deploy
+    ```
+
+    This builds the project and runs `wrangler deploy`, which publishes your Worker to Cloudflare's global network. The deployment target and bindings are defined in `wrangler.jsonc`.
+  </Step>
+</Steps>
+
+## Testing locally with MCP Inspector
+
+The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) lets you call GitMCP tools directly from a browser interface — useful for verifying that your local instance works correctly before connecting a full AI assistant.
+
+<Steps>
+  <Step title="Install and launch MCP Inspector">
+    ```bash
+    npx @modelcontextprotocol/inspector
+    ```
+  </Step>
+
+  <Step title="Connect to your local instance">
+    In the inspector interface:
+
+    1. Set **Transport Type** to `SSE`.
+    2. Enter your local GitMCP URL, for example `http://localhost:5173/docs`.
+    3. Click **Connect**.
+
+    The inspector lists all available MCP tools. You can invoke them with custom arguments and inspect the raw responses.
+  </Step>
+</Steps>
+
+## Infrastructure overview
+
+The self-hosted deployment uses several Cloudflare primitives defined in `wrangler.jsonc`:
+
+| Resource | Purpose |
+|---|---|
+| **Workers** | Serves the MCP endpoint and handles all API requests |
+| **Durable Objects** (`MyMCP`) | Maintains MCP session state per connection |
+| **Durable Objects** (`ViewCounterDO`) | Tracks badge view counts per repository |
+| **KV** (`CACHE_KV`) | Caches fetched documentation to reduce GitHub API calls |
+| **R2** (`DOCS_BUCKET`) | Stores pre-built documentation artifacts |
+| **Vectorize** | Powers semantic search over repository documentation |
+| **Analytics Engine** | Collects request metrics |
+| **AI binding** | Runs Cloudflare Workers AI for on-device inference |
+
+You can configure or remove bindings in `wrangler.jsonc` to match what your Cloudflare plan supports.

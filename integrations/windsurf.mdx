@@ -1,0 +1,43 @@
+---
+title: "Connect Windsurf"
+description: "Add GitMCP as an MCP server in Windsurf to give your AI assistant access to up-to-date GitHub documentation."
+---
+
+Windsurf (by Codeium) supports remote MCP servers through a dedicated JSON configuration file. GitMCP connects over SSE, so no extra tooling is needed.
+
+## Prerequisites
+
+- [Windsurf](https://codeium.com/windsurf) installed on your machine.
+- The GitHub `{owner}` and `{repo}` values for the repository you want to connect.
+
+## Configuration
+
+<Steps>
+  <Step title="Open the Windsurf MCP config file">
+    Open `~/.codeium/windsurf/mcp_config.json` in any text editor. If the file does not exist, create it.
+  </Step>
+  <Step title="Add the GitMCP server">
+    Paste the following configuration, replacing `{owner}` with the GitHub username or organization and `{repo}` with the repository name:
+
+    ```json
+    {
+      "mcpServers": {
+        "gitmcp": {
+          "serverUrl": "https://gitmcp.io/{owner}/{repo}"
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Restart Windsurf">
+    Save the file and restart Windsurf. The GitMCP server will be available to the AI assistant in your next session.
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name. For example, to connect to `github.com/microsoft/playwright-mcp`, use `https://gitmcp.io/microsoft/playwright-mcp`.
+</Note>
+
+<Tip>
+  To let your AI assistant access any repository on demand, use the generic endpoint: `https://gitmcp.io/docs`. The AI will prompt for or infer the target repository based on context.
+</Tip>

@@ -1,0 +1,79 @@
+{
+  "projectType": "saas",
+  "projectName": "GitMCP",
+  "projectDescription": "A free, open-source remote MCP server that transforms any GitHub repository or GitHub Pages site into an AI-accessible documentation hub, eliminating code hallucinations in AI coding assistants.",
+  "theme": "luma",
+  "primaryColor": "#7c7d7d",
+  "lightColor": "#d8d8d8",
+  "darkColor": "#101111",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Connect Your AI Assistant",
+            "pages": [
+              "integrations/cursor",
+              "integrations/claude-desktop",
+              "integrations/windsurf",
+              "integrations/vscode",
+              "integrations/cline",
+              "integrations/other-clients"
+            ]
+          },
+          {
+            "group": "MCP Tools Reference",
+            "pages": [
+              "tools/overview",
+              "tools/fetch-documentation",
+              "tools/search-documentation",
+              "tools/search-code",
+              "tools/fetch-url-content"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/url-formats",
+              "guides/badge",
+              "guides/self-hosting",
+              "guides/privacy",
+              "guides/contributing"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Zero-setup remote MCP server for any public GitHub repository",
+    "Supports GitHub repositories (gitmcp.io/{owner}/{repo}) and GitHub Pages ({owner}.gitmcp.io/{repo})",
+    "Generic dynamic endpoint (gitmcp.io/docs) for on-demand repository access",
+    "Smart documentation search with AutoRAG (Cloudflare AI) and vector search fallback",
+    "Embedded in-browser chat for interacting with repository documentation",
+    "Repository view count badge for README files",
+    "Respects robots.txt directives for GitHub Pages",
+    "llms.txt support with README.md fallback",
+    "Deployed on Cloudflare Workers with KV caching and R2 storage"
+  ],
+  "publicApiSurface": [
+    "fetch_{repo}_documentation — Fetches primary documentation (llms.txt, README.md) for a specific repository",
+    "search_{repo}_documentation — Semantically searches repository documentation using AutoRAG or vector search",
+    "search_{repo}_code — Searches repository source code via GitHub Search API with pagination",
+    "fetch_generic_url_content — Fetches content from any absolute URL respecting robots.txt",
+    "fetch_generic_documentation — Generic endpoint: fetches docs for any owner/repo combination",
+    "search_generic_documentation — Generic endpoint: searches docs for any owner/repo combination",
+    "search_generic_code — Generic endpoint: searches code for any owner/repo combination",
+    "match_common_libs_owner_repo_mapping — Maps library names to GitHub owner/repo for generic endpoint",
+    "GET /badge/{owner}/{repo} — Returns shields.io-compatible badge with view count"
+  ]
+}

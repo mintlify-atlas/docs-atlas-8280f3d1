@@ -1,0 +1,43 @@
+---
+title: "Connect Cursor"
+description: "Add GitMCP as an MCP server in Cursor to give your AI assistant access to up-to-date GitHub documentation."
+---
+
+Cursor supports remote MCP servers natively via a simple JSON configuration file. Adding GitMCP takes less than a minute and requires no additional software.
+
+## Prerequisites
+
+- [Cursor](https://www.cursor.com/) installed on your machine.
+- The GitHub `{owner}` and `{repo}` values for the repository you want to connect.
+
+## Configuration
+
+<Steps>
+  <Step title="Open the Cursor MCP config file">
+    Open `~/.cursor/mcp.json` in any text editor. If the file does not exist, create it.
+  </Step>
+  <Step title="Add the GitMCP server">
+    Paste the following configuration, replacing `{owner}` with the GitHub username or organization and `{repo}` with the repository name:
+
+    ```json
+    {
+      "mcpServers": {
+        "gitmcp": {
+          "url": "https://gitmcp.io/{owner}/{repo}"
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Restart Cursor">
+    Save the file and restart Cursor. The GitMCP server will appear in your MCP server list and will be available to the AI assistant automatically.
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name. For example, to connect to `github.com/microsoft/typescript`, use `https://gitmcp.io/microsoft/typescript`.
+</Note>
+
+<Tip>
+  If you work with many different repositories and want your AI assistant to pick the right one dynamically, use the generic endpoint instead: `https://gitmcp.io/docs`. The AI will ask for or infer the target repository on each request.
+</Tip>

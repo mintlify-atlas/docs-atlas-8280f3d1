@@ -1,0 +1,48 @@
+---
+title: "Connect Claude Desktop"
+description: "Add GitMCP as an MCP server in Claude Desktop to give Claude access to up-to-date GitHub documentation."
+---
+
+Claude Desktop supports MCP servers through its developer settings. Because Claude Desktop uses a stdio-based transport, GitMCP is connected via `npx mcp-remote`, which bridges the SSE endpoint to stdio without requiring any permanent installation.
+
+## Prerequisites
+
+- [Claude Desktop](https://claude.ai/download) installed on your machine.
+- [Node.js](https://nodejs.org/) available on your PATH (required for `npx`).
+- The GitHub `{owner}` and `{repo}` values for the repository you want to connect.
+
+## Configuration
+
+<Steps>
+  <Step title="Open the Claude Desktop config file">
+    In Claude Desktop, go to **Settings → Developer → Edit Config**. This opens the `claude_desktop_config.json` file in your default text editor.
+  </Step>
+  <Step title="Add the GitMCP server">
+    Add or merge the following into the configuration file, replacing `{owner}` with the GitHub username or organization and `{repo}` with the repository name:
+
+    ```json
+    {
+      "mcpServers": {
+        "gitmcp": {
+          "command": "npx",
+          "args": [
+            "mcp-remote",
+            "https://gitmcp.io/{owner}/{repo}"
+          ]
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Save and restart Claude Desktop">
+    Save the config file and fully quit and relaunch Claude Desktop. The GitMCP server will be listed under connected MCP servers.
+  </Step>
+</Steps>
+
+<Note>
+  Replace `{owner}` with the GitHub username or organization name, and `{repo}` with the repository name. For example, to connect to `github.com/facebook/react`, use `https://gitmcp.io/facebook/react`.
+</Note>
+
+<Tip>
+  For dynamic access across many repositories, swap the URL for the generic endpoint: `https://gitmcp.io/docs`. Claude will determine which repository to query based on your prompt context.
+</Tip>

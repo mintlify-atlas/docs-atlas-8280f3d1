@@ -1,80 +1,81 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Connect your first GitHub repository to an AI assistant in under two minutes."
 ---
 
-## Get started in three steps
+## URL Conversion
 
-Get your documentation site running locally and make your first customization.
+GitMCP works by converting a GitHub URL into a GitMCP URL. Use the table below to find the right format for your use case:
 
-### Step 1: Set up your local environment
+| GitHub URL | GitMCP URL |
+|---|---|
+| `github.com/owner/repo` | `gitmcp.io/owner/repo` |
+| `owner.github.io/repo` | `owner.gitmcp.io/repo` |
+| Any repository (dynamic) | `gitmcp.io/docs` |
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+<Steps>
+  <Step title="Build your GitMCP URL">
+    Take any GitHub repository URL and swap the domain.
 
-### Step 2: Deploy your changes
+    **Example:** Convert `https://github.com/langchain-ai/langgraph` to:
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```
+    https://gitmcp.io/langchain-ai/langgraph
+    ```
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    Replace `langchain-ai` with the GitHub username or organization, and `langgraph` with the repository name.
+  </Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Add to your AI assistant">
+    Open your Cursor configuration file at `~/.cursor/mcp.json` and add the GitMCP server:
 
-### Step 3: Go live
+    ```json
+    {
+      "mcpServers": {
+        "gitmcp": {
+          "url": "https://gitmcp.io/langchain-ai/langgraph"
+        }
+      }
+    }
+    ```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    <Note>
+      Restart Cursor after saving the configuration file for the changes to take effect.
+    </Note>
+  </Step>
 
-## Next steps
+  <Step title="Prompt your AI">
+    Start a conversation in your AI assistant and ask something that requires the repository's documentation:
 
-Now that you have your docs running, explore these key features:
+    > "Add memory to my LangGraph agent"
+
+    The AI will call GitMCP to fetch the latest documentation and code from the repository before generating its response — no hallucinations, no stale context.
+  </Step>
+
+  <Step title="Verify it's working">
+    Look for a tool call in the conversation. When GitMCP is active, your AI assistant will show a tool invocation such as `fetch_langgraph_documentation` or `search_langgraph_documentation` before it responds.
+
+    If you see that tool call, GitMCP is connected and working correctly.
+  </Step>
+</Steps>
+
+<Tip>
+  Don't want to pick a specific repository upfront? Use the generic endpoint `https://gitmcp.io/docs` instead. Your AI assistant will determine which GitHub repository to access based on the context of each request, giving you flexibility across multiple projects in a single session.
+</Tip>
+
+## Connect your AI assistant
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Connect Cursor" icon="arrow-right" href="/integrations/cursor">
+    Configure GitMCP in Cursor using the `~/.cursor/mcp.json` file.
+  </Card>
+  <Card title="Connect Claude Desktop" icon="arrow-right" href="/integrations/claude-desktop">
+    Configure GitMCP in Claude Desktop via Settings > Developer > Edit Config.
+  </Card>
+  <Card title="Connect Windsurf" icon="arrow-right" href="/integrations/windsurf">
+    Configure GitMCP in Windsurf using the `mcp_config.json` file.
+  </Card>
+  <Card title="Connect VS Code" icon="arrow-right" href="/integrations/vscode">
+    Configure GitMCP in VS Code using the `.vscode/mcp.json` file.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

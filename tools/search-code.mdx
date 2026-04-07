@@ -1,0 +1,167 @@
+---
+title: "search_{repo}_code"
+description: "Searches a repository's source code using the GitHub Search API with exact matching. Returns matching file paths with pagination support."
+---
+
+This tool searches a repository's source code using the GitHub Search API. Unlike the documentation search, which is semantic, code search uses exact string matching — making it suited for finding specific function names, identifiers, configuration keys, or error strings.
+
+<Tip>
+  Use this tool when you need to find where something is implemented, see real usage examples in the codebase, or locate a specific string that the documentation only mentions by name.
+</Tip>
+
+## Tool name
+
+For repository-specific endpoints, the tool is named using the repository name:
+
+```
+search_{repo}_code
+```
+
+For example, connecting to `gitmcp.io/vercel/next.js` registers the tool as `search_next_js_code`.
+
+<Tabs>
+  <Tab title="Specific endpoint">
+    Tool name: `search_{repo}_code`
+
+    Requires a `query` parameter. The `page` parameter is optional.
+  </Tab>
+  <Tab title="Generic endpoint (gitmcp.io/docs)">
+    Tool name: `search_generic_code`
+
+    Requires `owner`, `repo`, and `query` parameters. The `page` parameter is optional.
+  </Tab>
+</Tabs>
+
+## Parameters
+
+<Tabs>
+  <Tab title="Specific endpoint">
+    <ParamField path="query" type="string" required>
+      The search term to find in the repository's source code. The GitHub Search API performs exact string matching on file contents and paths.
+    </ParamField>
+
+    <ParamField path="page" type="number" default="1">
+      Page number to retrieve, starting from 1. Each page contains 30 results. Omit to retrieve the first page.
+    </ParamField>
+  </Tab>
+  <Tab title="Generic endpoint (gitmcp.io/docs)">
+    <ParamField path="owner" type="string" required>
+      The GitHub repository owner (username or organization name).
+    </ParamField>
+
+    <ParamField path="repo" type="string" required>
+      The GitHub repository name.
+    </ParamField>
+
+    <ParamField path="query" type="string" required>
+      The search term to find in the repository's source code.
+    </ParamField>
+
+    <ParamField path="page" type="number" default="1">
+      Page number to retrieve, starting from 1. Each page contains 30 results.
+    </ParamField>
+  </Tab>
+</Tabs>
+
+## How code search works
+
+GitMCP passes your query directly to the [GitHub Code Search API](https://docs.github.com/en/rest/search/search#search-code), scoped to the connected repository. GitHub performs exact string matching across file names and file contents.
+
+Each result includes:
+
+- **File name** — the base name of the matching file
+- **Path** — the full path within the repository
+- **HTML URL** — a link to the file on GitHub
+- **Git URL** — the raw Git object URL
+- **Score** — GitHub's relevance score for the match
+
+The AI can use the HTML URL or Git URL to fetch the full file content using [`fetch_generic_url_content`](/tools/fetch-url-content).
+
+## Pagination
+
+Results are returned 30 per page. If a search matches more files than fit on one page, the response includes a `pagination` object.
+
+To retrieve additional results, call the tool again with an incremented `page` value.
+
+```
+First call:  search_next_js_code({ query: "useRouter", page: 1 })  → page 1 of N
+Second call: search_next_js_code({ query: "useRouter", page: 2 })  → page 2 of N
+```
+
+## Response
+
+<ResponseField name="searchQuery" type="string">
+  The query string as provided.
+</ResponseField>
+
+<ResponseField name="content" type="object[]">
+  An array containing a single text content block with formatted search results.
+
+  <Expandable title="properties">
+    <ResponseField name="content[].type" type="string">
+      Always `"text"`.
+    </ResponseField>
+
+    <ResponseField name="content[].text" type="string">
+      Formatted results listing matching files. Each entry includes file name, path, HTML URL, Git URL, and relevance score. Includes a summary line showing total match count and current page.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Present when the search returned results. Omitted if the query failed or returned no matches.
+
+  <Expandable title="properties">
+    <ResponseField name="pagination.totalCount" type="number">
+      Total number of matching files across all pages.
+    </ResponseField>
+
+    <ResponseField name="pagination.currentPage" type="number">
+      The page number that was returned.
+    </ResponseField>
+
+    <ResponseField name="pagination.perPage" type="number">
+      Number of results per page. Always `30`.
+    </ResponseField>
+
+    <ResponseField name="pagination.hasMorePages" type="boolean">
+      `true` if there are additional pages of results beyond the current page.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+```
+User: Show me how useRouter is used in the Next.js codebase.
+
+AI calls: search_next_js_code({ query: "useRouter", page: 1 })
+
+Tool returns:
+{
+  "searchQuery": "useRouter",
+  "content": [{
+    "type": "text",
+    "text": "### Code Search Results for: \"useRouter\"\n\nFound 142 matches in vercel/next.js.\nPage 1 of 5.\n\n#### router.ts\n- **Path**: packages/next/src/client/router.ts\n- **URL**: https://github.com/vercel/next.js/blob/main/packages/next/src/client/router.ts\n..."
+  }],
+  "pagination": {
+    "totalCount": 142,
+    "currentPage": 1,
+    "perPage": 30,
+    "hasMorePages": true
+  }
+}
+```
+
+<Note>
+  GitHub Search API rate limits apply. If the repository is very large or the query is very broad, you may encounter rate limit responses. Narrow your query to reduce the result set.
+</Note>
+
+## When to use this tool vs. others
+
+| Situation | Recommended tool |
+|---|---|
+| General overview, purpose, getting started | [`fetch_{repo}_documentation`](/tools/fetch-documentation) |
+| Specific feature, function, or concept | [`search_{repo}_documentation`](/tools/search-documentation) |
+| Finding a code implementation | **`search_{repo}_code`** |
+| Following a link from the docs | [`fetch_generic_url_content`](/tools/fetch-url-content) |

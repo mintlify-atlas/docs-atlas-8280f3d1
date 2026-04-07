@@ -1,97 +1,67 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "GitMCP — Stop Code Hallucinations"
+description: "A free, open-source remote MCP server that gives any AI assistant accurate, up-to-date context from any GitHub repository."
 ---
 
-## Setting up
+GitMCP transforms any GitHub repository or GitHub Pages site into a remote [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server — instantly, with zero setup. Point your AI coding assistant at a GitMCP URL and it gains accurate, real-time access to that project's documentation and code. No more hallucinated APIs or outdated examples.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Connect your first repository to an AI assistant in under two minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="How it works" icon="gears" href="/how-it-works">
+    Learn how GitMCP fetches and serves documentation via MCP.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Connect your AI assistant" icon="plug" href="/integrations/cursor">
+    Step-by-step setup for Cursor, Claude, Windsurf, VSCode, Cline, and more.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="MCP tools reference" icon="wrench" href="/tools/overview">
+    Explore all tools GitMCP exposes to AI assistants.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Why GitMCP?
 
-Everything you need to create world-class documentation.
+AI coding assistants are only as good as their context. Without access to up-to-date documentation, they guess — and they guess wrong. GitMCP solves this by acting as a live bridge between your AI tool and any GitHub project.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+<CardGroup cols={3}>
+  <Card title="Zero setup" icon="bolt">
+    No downloads, no sign-ups. Just replace `github.com` with `gitmcp.io` in any repository URL.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="Any repository" icon="github">
+    Works with every public GitHub repository and GitHub Pages site — no changes required on the project side.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="Always current" icon="rotate">
+    Fetches documentation directly from the source, so your AI always has the latest information.
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+</CardGroup>
 
-## Need inspiration?
+## Get started in three steps
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
+<Steps>
+  <Step title="Build your GitMCP URL">
+    Replace the domain in your GitHub URL:
+
+    | Source | GitMCP URL |
+    |--------|-----------|
+    | `github.com/owner/repo` | `gitmcp.io/owner/repo` |
+    | `owner.github.io/repo` | `owner.gitmcp.io/repo` |
+    | Any repository (dynamic) | `gitmcp.io/docs` |
+  </Step>
+  <Step title="Add it to your AI assistant">
+    Paste the GitMCP URL as a new MCP server in your IDE or AI tool. See the [integration guides](/integrations/cursor) for exact configuration steps.
+  </Step>
+  <Step title="Start coding without hallucinations">
+    Ask your AI assistant about the library. It will automatically call GitMCP to fetch accurate, current documentation before answering.
+  </Step>
+</Steps>
+
+## Compatible AI assistants
+
+GitMCP works with any MCP-compatible AI tool, including:
+
+**Cursor** · **Claude Desktop** · **Windsurf** · **VSCode** · **Cline** · **Highlight AI** · **Augment Code** · **Msty AI**
+
+<Card title="See all integration guides" icon="list" href="/integrations/cursor">
+  Detailed configuration instructions for every supported AI assistant.
 </Card>
